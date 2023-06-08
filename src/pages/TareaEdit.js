@@ -6,7 +6,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as  AsyncStorage from '../utils/AsyncStorage';
 import { StyleSheet } from "react-native";
 
-const Tarea = (props) => {
+const TareaEdit = (props) => {
+
+    const [id, setId] = useState(0)
     const [title, setTitle] = useState('');
     const [descripcion, setDescripcion] = useState('');
 
@@ -14,10 +16,27 @@ const Tarea = (props) => {
     const [date, setDate] = useState(new Date());
     const [open, setOpen] = useState(false);
 
-
     const [type, setType] = useState('');
     const [status, setStatus] = useState('');
     const [complete, setComplete] = useState(true);
+
+    useEffect(() => {
+        const task = props.route.params.task;
+
+        setType(task.type);
+        if (task.type == 'reminder' || task.type == 'activity') {
+            setId(task.id);
+            setTitle(task.title);
+            setDescripcion(task.descripcion);
+            setDate(new Date(task.date));
+            setDateSelected(task.date);
+        } else if (task.type == 'task') {
+            setId(task.id);
+            setTitle(task.title);
+            setDescripcion(task.descripcion);
+            setStatus(task.status);
+        }
+    }, []);
 
     const handleSubmit = async () => {
         let complete = handleVerify();
@@ -26,35 +45,35 @@ const Tarea = (props) => {
             let save;
             if (type == 'task') {
                 let body = {
+                    id: id,
                     title: title,
                     descripcion: descripcion,
                     type: type,
                     status: status
                 }
 
-                save = await AsyncStorage.saveData(body);
+                save = await AsyncStorage.editTask(props.route.params.task.id, body);
             } else if (type != 'task') {
                 let body = {
+                    id: id,
                     title: title,
                     descripcion: descripcion,
                     date: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`,
-                    type: type,
-                    status: status
+                    type: type
                 }
 
-                save = await AsyncStorage.saveData(body);
+                save = await AsyncStorage.editTask(props.route.params.task.id, body);
             }
 
             if (save) handleButtonClick('EntradaScreen');
         }
 
     };
-
     const handleVerify = () => {
         if (type == 'task') {
             if (title == "" || descripcion == "" || status == "") return false;
             else return true;
-        } else if(type == 'reminder' || type == 'activity') {
+        } else if (type == 'reminder' || type == 'activity') {
             if (title == '' || descripcion == '' || date == '') return false;
             else return true;
         }
@@ -151,7 +170,7 @@ const Tarea = (props) => {
             }
 
             <View style={style.boton}>
-            <Button title="Submit" onPress={handleSubmit} />
+                <Button title="Submit" onPress={handleSubmit} />
             </View>
 
             {!complete && (
@@ -161,8 +180,8 @@ const Tarea = (props) => {
             )}
         </View>
     );
-
 }
+
 
 const style = StyleSheet.create({
     input: {
@@ -177,9 +196,9 @@ const style = StyleSheet.create({
         color: 'red',
         alignContent: 'center'
     },
-    boton:{
-       marginTop: 10
+    boton: {
+        marginTop: 10
     }
 });
 
-export default Tarea;
+export default TareaEdit;

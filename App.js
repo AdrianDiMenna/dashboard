@@ -7,6 +7,7 @@ import HomeScreen from './src/pages/HomeScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Entrada from './src/pages/Entrada';
 import EntradaTab from './src/tabs/EntradaTab';
+import DashboardTab from './src/tabs/DashboardTab';
 
 const Stack = createBottomTabNavigator();
 
@@ -15,18 +16,13 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name='EntradaTab'
+          name='Entrada'
           component={EntradaTab}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name='Home'
-          component={HomeScreen}
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen
           name='Dashboard'
-          component={Dashboard}
+          component={DashboardTab}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

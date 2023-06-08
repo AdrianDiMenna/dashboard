@@ -16,6 +16,7 @@ export const saveData = async (task) => {
             await AsyncStorage.setItem('task', JSON.stringify(arr));
             console.log('Data saved!!');
         }
+        return true;
 
     } catch (error) {
         console.log('Error savign data', error);
@@ -35,6 +36,34 @@ export const getData = async () => {
     }
 }
 
+export const getTaskId = async (id) => {
+    try {
+        let tasks = await AsyncStorage.getItem('task') || false;
+
+        if (tasks) {
+            let data = JSON.parse(tasks);
+            return data.find(item => item.id == id);
+        }
+    } catch (error) {
+        console.log('Error retrieving data: ', error);
+    }
+}
+
+export const editTask = async (id, task) =>{
+    try {
+        let tasks = await AsyncStorage.getItem('task') || false;
+
+        if(tasks){
+            let data = JSON.parse(tasks);
+            let filter = data.filter(item => item.id != id);
+            filter = [...filter, task];
+            await AsyncStorage.setItem('task', JSON.stringify(filter));
+            return true;
+        }
+    } catch (error) {
+        console.log('Error retrieving data: ', error);
+    }
+}
 
 export const generateId = (tasks) => {
     try {
@@ -63,8 +92,8 @@ export const deleteById = async (id) => {
         if (tasks != false) {
             let value = JSON.parse(tasks);
             let place = value.findIndex((item) => item.id == id);
-            if(place != -1) value.splice(place, 1);
-            await AsyncStorage.setItem('task',JSON.stringify(value));
+            if (place != -1) value.splice(place, 1);
+            await AsyncStorage.setItem('task', JSON.stringify(value));
         } else {
             console.log('Not Tasks for delete...');
         }
@@ -73,9 +102,28 @@ export const deleteById = async (id) => {
     }
 }
 
-export const deleteStorage = async () =>{
+export const deleteStorage = async () => {
     try {
         await AsyncStorage.clear();
+    } catch (error) {
+        console.log('Error retrieving data: ', error);
+    }
+}
+
+export const checkTypeStorage = async (id) => {
+    try {
+        let tasks = await AsyncStorage.getItem('task') || false;
+
+        if (tasks != false) {
+            let value = JSON.parse(tasks);
+            let place = value.findIndex((item) => item.id == id);
+            if (place != -1) {
+                value[place].status = 'done';
+                await AsyncStorage.setItem('task', JSON.stringify(value));
+            }
+        } else {
+            console.log('Not Tasks for delete...');
+        }
     } catch (error) {
         console.log('Error retrieving data: ', error);
     }
